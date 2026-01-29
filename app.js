@@ -9,6 +9,7 @@ app.use(express.json());
 connectDB()
 
 app.use("/auth", require("./routes/auth"))
+app.use("/memos", require("./routes/memo"))
 
 app.get("/health", (req, res)=>{
     res.json({status:"Ok"})
