@@ -1,7 +1,9 @@
 const express = require("express")
 const Memo = require("../models/memo");
+const authMiddleware = require("../middleware/auth")
 
 const router = express.Router();
+router.use(authMiddleware);
 
 /**
  * Get /memos - get all memos
