@@ -99,7 +99,7 @@ router.post("/login", async(req, res) => {
     res.json({ token });
 });
 
-//get current logged in users
+//get - check if current user is logged in or not
 router.get("/me", authMiddleware, async(req, res) => {
     try{
         const user = await User.findById(req.userId).select("-password");
@@ -112,6 +112,42 @@ router.get("/me", authMiddleware, async(req, res) => {
         res.status(500).json({
             message:"Error fetching user",
             error:error.message
+        })
+    }
+})
+
+//post - change password
+router.post("/change-password", authMiddleware, async(req, res) => {
+    try{
+        const {oldPassword, newPassword} = req.body;
+
+        if(!oldPassword || !newPassword){
+            return res.status(400).json({message:"Old password and new password are required"});
+        }
+        //1. get current user
+        const user = await User.findById(req.userId);
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+
+        //2. check old password
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if(!isMatch){
+            return res.status(401).json({message:"old password entered is incorrect"});
+        }
+
+        //3. Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        //4. Update new password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({message:"Password changed successfully!"})
+    }catch(error){
+        res.status(500).json({
+            message:"Error changing password",
+            error: error.message
         })
     }
 })
