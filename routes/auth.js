@@ -152,5 +152,79 @@ router.post("/change-password", authMiddleware, async(req, res) => {
     }
 })
 
+//post - forgot password - request otp
+router.post("/forgot-password/request-otp", async(req, res) => {
+    try{
+        const {email} = req.body;
+
+        if(!email)
+            return res.status(400).json({message:"Enter a valid email address"})
+        
+        const user = await User.findOne({email});
+        if(!user) return res.status(400).json({message:"user not found"})
+
+        const otp = generateOTP();
+        const otpHash = await bcrypt.hash(otp, 10);
+
+        await OTP.findOneAndDelete({email});
+
+        await OTP.create({
+            email,
+            otpHash,
+            expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+        });
+
+        await transporter.sendMail({
+            to:email,
+            subject:"Password reset OTP",
+            text:`Your password reset OTP is ${otp}`
+        });
+
+        res.json({message:"Password reset otp sent"})
+    }catch(error){
+        res.status(500).json({
+            message:"Error sending reset otp",
+            error:error.message
+        })
+    }
+});
+
+//post - verify and reset password
+router.post("/forgot-password/reset", async(req, res)=>{
+    try {
+        const {email, otp, newPassword} = req.body;
+
+        if(!email || !otp || !newPassword){
+            return res.status(400).json({message:"Email, OTP and new password are required"})
+        }
+
+        const record = await OTP.findOne({email});
+        if(!record)
+            return res.status(400).json({message:"OTP not found"});
+
+        if(record.expiresAt < Date.now())
+            return res.status(400).json({message:"OTP expired"})
+
+
+        const isValid = await bcrypt.compare(otp, record.otpHash);
+        if(!isValid)
+            return res.status(400).json({message:"Invalid OTP entered"})
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await User.findOneAndUpdate(
+            {email},
+            {password: hashedPassword}
+        );
+        await OTP.deleteOne({email});
+        res.json({message:"Password reset successful"})
+    } catch (error) {
+        res.status(500).json({
+            message:"Error resetting password",
+            error:error.message
+        })
+    }
+})
+
 
 module.exports = router;
