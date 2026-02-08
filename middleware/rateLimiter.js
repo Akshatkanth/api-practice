@@ -4,10 +4,10 @@ const WINDOW_SIZE =  60 * 1000; //1 MINUTE
 const MAX_REQUESTS = 5;
 
 function rateLimiter(req, res, next){
-    const key = key.ip; //identify client by ip
+    const key = req.ip; //identify client by ip
     const currentTime = Date.now();
 
-    const userData = Date.now();
+    const userData = rateLimitMap.get(key);
 
     if(!userData){
         //first request
