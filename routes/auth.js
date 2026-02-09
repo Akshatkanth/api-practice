@@ -5,6 +5,7 @@ const User = require("../models/user")
 const OTP = require("../models/otp")
 const transporter = require("../utils/mailer")
 const authMiddleware = require("../middleware/auth")
+const redisRateLimiter = require("../middleware/rateLimiter")
 const router = express.Router();
 
 //generate otp 
@@ -77,7 +78,7 @@ router.post("/signup/verify-otp", async (req, res) => {
 
 
 //post login
-router.post("/login", async(req, res) => {
+router.post("/login", redisRateLimiter, async(req, res) => {
     const {email, password} = req.body;
 
     if (!email || !password)
