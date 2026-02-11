@@ -2,7 +2,7 @@
 
 const redisClient = require("../config/redis")
 
-const WINDOW_SIZE =  60 * 1000; //1 MINUTE
+const WINDOW_SIZE =  60; //1 MINUTE
 const MAX_REQUESTS = 5;
 
 async function redisRateLimiter(req, res, next){
@@ -12,6 +12,13 @@ async function redisRateLimiter(req, res, next){
         
         //increase request count
         const currentCount = await redisClient.incr(key);
+        const ttl = await redisClient.ttl(key);
+
+        console.log("REDIS RATE LIMIT:", {
+            key,
+            currentCount,
+            ttl
+        });
 
         //if first request, set expiry
         if(currentCount === 1){
@@ -27,11 +34,16 @@ async function redisRateLimiter(req, res, next){
 
         next();
 
+        
+
     }catch(error){
         console.error("Rate limiter error:", error)
         next(); //fail-open 
     }
 }
+
+
+
 
 module.exports = redisRateLimiter;
 
