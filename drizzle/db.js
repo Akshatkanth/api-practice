@@ -1,11 +1,12 @@
+require("dotenv").config({path:"../.env"})
 const { drizzle } = require("drizzle-orm/node-postgres");
 const { Client } = require("pg");
-require("dotenv").config()
+
 const client = new Client({
     host:"localhost",
     port:5432,
     user: "postgres",
-    password: process.env.db_password,
+    password:process.env.db_password,
     database: "drizzle_db"
 });
 
