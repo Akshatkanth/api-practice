@@ -13,4 +13,4 @@ const password = "mySecretPassword"
 const hashedPassword = hashWithMD5(password)
 
 console.log("Orignial:", password)
-console.log("MD% Hashed password:", hashedPassword)
+console.log("MD5 Hashed password:", hashedPassword)
