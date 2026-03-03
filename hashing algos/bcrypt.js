@@ -21,6 +21,26 @@ app.post('/signup', async (req, res) => {
     console.log("users:", users)
     res.send('Ok')      
 })
+
+
+//login
+app.post('/login', async(req, res)=>{
+    const {username, password} = req.body
+    const user = users.find(u => u.username === username)
+    if(!user){
+        res.send("no username")
+        return
+    }
+    const isValid = await bcrypt.compare(password, user.password)
+    if(!isValid){
+        res.send("wrong password")
+        return
+    }
+
+    //send cookie
+    //send jwt
+    res.send('ok')
+})
 app.listen(3000, () => console.log('Server running on port 3000'))
 // const password = 'Password1'
 
