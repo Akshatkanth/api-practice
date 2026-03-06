@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button onclick="callAPI()">Call API</button>
+
+<script>
+function callAPI() {
+  fetch("http://localhost:3000/api/test")
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error(err));
+}
+</script>
+
+</body>
+</html>
