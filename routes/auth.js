@@ -7,6 +7,7 @@ const transporter = require("../utils/mailer")
 const authMiddleware = require("../middleware/auth")
 const redisRateLimiter = require("../middleware/rateLimiter")
 const router = express.Router();
+const signupSchema = require("../validators/userValidator")
 
 //generate otp 
 const generateOTP = () => 
@@ -14,10 +15,11 @@ const generateOTP = () =>
 
 //request otp 
 router.post("/signup/request-otp", async(req, res) => {
-    const {email, password} = req.body;
+    const result = signupSchema.safeParse(req.body);
+    if (!result.success)
+        return res.status(400).json({ errors: result.error.errors });
 
-    if (!email || !password)
-        return res.status(400).json({ message: "Email and password required" });
+    const {email, password} = result.data;
 
     const existingUser = await User.findOne({ email });
     if (existingUser)
