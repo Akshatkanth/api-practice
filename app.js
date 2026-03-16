@@ -3,7 +3,7 @@ const express = require("express")
 
 
 const app = express()
-const connectDB = require("./config/db")
+const connectDB = require("./config/db") //redis
 
 app.use(express.json());
 connectDB()
