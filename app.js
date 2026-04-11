@@ -17,7 +17,11 @@ app.get("/health", (req, res)=>{
     res.json({status:"Ok"})
 });
 
+const swaggerUi = require("swagger-ui-express")
+const swaggerJsdoc = require("swagger-jsdoc")
 
+const swaggerSpec = require("./config/swagger")
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 3000;
 
