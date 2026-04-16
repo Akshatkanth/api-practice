@@ -12,21 +12,14 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: Test endpoint working
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
  */
-router.get("/test", (req, res) => {
+router.get("/", (req, res) => {
   res.json({ message: "Test working" });
 });
 
 /**
  * @swagger
- * /limited:
+ * /test/limited:
  *   get:
  *     summary: Rate limited endpoint
  *     tags: [Test]
